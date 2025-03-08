@@ -1,10 +1,12 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpCode,
   HttpStatus,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -12,7 +14,7 @@ import {
 } from "@nestjs/common";
 import { MoviesService } from "./movies.service";
 import { AuthGuard } from "src/auth/guards/Auth.guard";
-import { MovieDto } from "./dto/movie.dto";
+import { CreateMovieDto, UpdateMovieDto } from "./dto/movie.dto";
 
 @Controller("movies")
 export class MoviesController {
@@ -35,8 +37,31 @@ export class MoviesController {
   @HttpCode(HttpStatus.CREATED)
   @UseGuards(AuthGuard)
   @Post()
-  async createMovie(@Body(ValidationPipe) movieDto: MovieDto, @Req() request) {
+  async createMovie(
+    @Body(ValidationPipe) createMovieDto: CreateMovieDto,
+    @Req() request,
+  ) {
     const { role } = request.user;
-    return this.moviesService.createMovie(movieDto, role);
+    return this.moviesService.createMovie(createMovieDto, role);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @Patch("/:id")
+  async updateMovie(
+    @Body(ValidationPipe) movieDto: UpdateMovieDto,
+    @Param("id") id: string,
+    @Req() request,
+  ) {
+    const { role } = request.user;
+    return this.moviesService.updateMovie(movieDto, id, role);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @Delete("/:id")
+  async deleteMovie(@Param("id") id: string, @Req() request) {
+    const { role } = request.user;
+    return this.moviesService.deleteMovie(id, role);
   }
 }

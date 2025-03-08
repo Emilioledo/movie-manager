@@ -3,8 +3,8 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
-  Put,
   Req,
   UseGuards,
   ValidationPipe,
@@ -31,7 +31,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Put("change-role")
+  @Patch("change-role")
   async changeRole(
     @Body(ValidationPipe) changeRoleDto: ChangeRoleDto,
     @Req() request,

@@ -84,14 +84,26 @@ export class AuthService {
     }
   }
 
-  async changeRole(changeRoleDto: ChangeRoleDto): Promise<void> {
+  async changeRole(
+    changeRoleDto: ChangeRoleDto,
+    requestRole: string,
+  ): Promise<void> {
     try {
+      if (requestRole !== "admin")
+        throw new UnauthorizedException(
+          "Only users with the admin role can change the role of other users",
+        );
+
       const { username, role } = changeRoleDto;
       const user = await this.findOne(username);
       if (!user) throw new ConflictException("User does not exist");
       await this.userModel.updateOne({ username }, { role });
     } catch (error) {
       if (error instanceof ConflictException) {
+        throw error;
+      }
+
+      if (error instanceof UnauthorizedException) {
         throw error;
       }
 

@@ -37,12 +37,7 @@ export class AuthController {
     @Body(ValidationPipe) changeRoleDto: ChangeRoleDto,
     @Req() request,
   ) {
-    const user = request.user;
-    if (user.role !== "admin") {
-      throw new UnauthorizedException(
-        "Only users with the admin role can change the role of other users",
-      );
-    }
-    return this.authService.changeRole(changeRoleDto);
+    const { role } = request.user;
+    return this.authService.changeRole(changeRoleDto, role);
   }
 }

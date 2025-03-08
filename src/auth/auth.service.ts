@@ -79,7 +79,7 @@ export class AuthService {
       }
 
       throw new InternalServerErrorException(
-        "An error occurred while registering the user",
+        "An error occurred while login the user",
       );
     }
   }
@@ -108,7 +108,7 @@ export class AuthService {
       }
 
       throw new InternalServerErrorException(
-        "An error occurred while registering the user",
+        "An error occurred while changing the role of user",
       );
     }
   }

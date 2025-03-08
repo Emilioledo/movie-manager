@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { AuthDto } from "./dto/auth.dto";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "./interfaces/auth.interface";
@@ -21,10 +25,11 @@ export class AuthService {
 
   async register(authDto: AuthDto) {
     const { username, password } = authDto;
+    const user = this.findOne(username);
+    if (user) throw new ConflictException("User already exists");
     const hashPass = await bcrypt.hash(password, this.saltOrRounds);
     const newUser: User = { id: 2, username, password: hashPass, rol: "user" };
     this.users.push(newUser);
-    return true;
   }
 
   async login(authDto: AuthDto): Promise<{ access_token: string }> {

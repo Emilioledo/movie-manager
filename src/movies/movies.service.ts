@@ -9,7 +9,6 @@ export class MoviesService {
   constructor(@InjectModel(Movie.name) private movieModel: Model<Movie>) {}
   async getAllMovies() {
     const response = await this.movieModel.find();
-    console.log("response", response);
     return {
       count: response.length,
       movies: response,

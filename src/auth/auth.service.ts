@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common";
-import { AuthDto } from "./dto/auth.dto";
+import { AuthDto, ChangeRoleDto } from "./dto/auth.dto";
 import { JwtService } from "@nestjs/jwt";
 import { User } from "./schemas/user.schema";
 import { InjectModel } from "@nestjs/mongoose";
@@ -40,7 +40,7 @@ export class AuthService {
       await this.userModel.create({
         username,
         password: hashPass,
-        rol: "user",
+        role: "user",
       });
     } catch (error) {
       if (error instanceof ConflictException) {
@@ -62,10 +62,34 @@ export class AuthService {
       if (!isPasswordMatch) {
         throw new UnauthorizedException();
       }
-      const payload = { sub: user._id, username: user.username };
-      return {
-        access_token: await this.jwtService.signAsync(payload),
+      const payload = {
+        sub: user._id.toString(),
+        username: user.username,
+        role: user.role,
       };
+
+      const access_token = await this.jwtService.signAsync(payload);
+
+      return {
+        access_token,
+      };
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        "An error occurred while registering the user",
+      );
+    }
+  }
+
+  async changeRole(changeRoleDto: ChangeRoleDto): Promise<void> {
+    try {
+      const { username, role } = changeRoleDto;
+      const user = await this.findOne(username);
+      if (!user) throw new ConflictException("User does not exist");
+      await this.userModel.updateOne({ username }, { role });
     } catch (error) {
       if (error instanceof ConflictException) {
         throw error;

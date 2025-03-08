@@ -5,41 +5,43 @@ import {
 } from "@nestjs/common";
 import { AuthDto } from "./dto/auth.dto";
 import { JwtService } from "@nestjs/jwt";
-import { User } from "./interfaces/auth.interface";
+import { User } from "./schemas/user.schema";
+import { InjectModel } from "@nestjs/mongoose";
+import { Model } from "mongoose";
 
 import * as bcrypt from "bcrypt";
 
 @Injectable()
 export class AuthService {
-  constructor(private jwtService: JwtService) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private jwtService: JwtService,
+  ) {}
 
   saltOrRounds: number = 10;
 
-  users: User[] = [
-    { id: 1, username: "john", password: "changeme", rol: "admin" },
-  ];
-
-  findOne(username: string): User {
-    return this.users.find((user) => user.username === username)!;
+  async findOne(username: string): Promise<User | null> {
+    const query = this.userModel.where({ username });
+    return query.findOne();
   }
 
   async register(authDto: AuthDto) {
     const { username, password } = authDto;
-    const user = this.findOne(username);
+    const user = await this.findOne(username);
     if (user) throw new ConflictException("User already exists");
     const hashPass = await bcrypt.hash(password, this.saltOrRounds);
-    const newUser: User = { id: 2, username, password: hashPass, rol: "user" };
-    this.users.push(newUser);
+    await this.userModel.create({ username, password: hashPass, rol: "user" });
   }
 
   async login(authDto: AuthDto): Promise<{ access_token: string }> {
     const { username, password } = authDto;
-    const user = this.findOne(username);
+    const user = await this.findOne(username);
+    if (!user) throw new ConflictException("User does not exist");
     const isPasswordMatch = await bcrypt.compare(password, user?.password);
     if (!isPasswordMatch) {
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.id, username: user.username };
+    const payload = { sub: user._id, username: user.username };
     return {
       access_token: await this.jwtService.signAsync(payload),
     };

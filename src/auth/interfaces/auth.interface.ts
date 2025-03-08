@@ -1,7 +1,7 @@
-type Rol = 'admin' | 'user';
+export type Rol = "admin" | "user";
 
 export interface User {
-  id: number;
+  _id: number;
   username: string;
   password: string;
   rol: Rol;

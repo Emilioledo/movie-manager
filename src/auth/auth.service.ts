@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { AuthDto } from "./dto/auth.dto";
@@ -25,25 +26,54 @@ export class AuthService {
     return query.findOne();
   }
 
-  async register(authDto: AuthDto) {
+  async register(authDto: AuthDto): Promise<void> {
     const { username, password } = authDto;
-    const user = await this.findOne(username);
-    if (user) throw new ConflictException("User already exists");
-    const hashPass = await bcrypt.hash(password, this.saltOrRounds);
-    await this.userModel.create({ username, password: hashPass, rol: "user" });
+
+    try {
+      const user = await this.findOne(username);
+      if (user) {
+        throw new ConflictException("User already exists");
+      }
+
+      const hashPass = await bcrypt.hash(password, this.saltOrRounds);
+
+      await this.userModel.create({
+        username,
+        password: hashPass,
+        rol: "user",
+      });
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        "An error occurred while registering the user",
+      );
+    }
   }
 
   async login(authDto: AuthDto): Promise<{ access_token: string }> {
-    const { username, password } = authDto;
-    const user = await this.findOne(username);
-    if (!user) throw new ConflictException("User does not exist");
-    const isPasswordMatch = await bcrypt.compare(password, user?.password);
-    if (!isPasswordMatch) {
-      throw new UnauthorizedException();
+    try {
+      const { username, password } = authDto;
+      const user = await this.findOne(username);
+      if (!user) throw new ConflictException("User does not exist");
+      const isPasswordMatch = await bcrypt.compare(password, user?.password);
+      if (!isPasswordMatch) {
+        throw new UnauthorizedException();
+      }
+      const payload = { sub: user._id, username: user.username };
+      return {
+        access_token: await this.jwtService.signAsync(payload),
+      };
+    } catch (error) {
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException(
+        "An error occurred while registering the user",
+      );
     }
-    const payload = { sub: user._id, username: user.username };
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-    };
   }
 }

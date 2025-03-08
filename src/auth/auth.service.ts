@@ -1,7 +1,6 @@
 import {
   ConflictException,
   Injectable,
-  InternalServerErrorException,
   UnauthorizedException,
 } from "@nestjs/common";
 import { AuthDto, ChangeRoleDto } from "./dto/auth.dto";

@@ -7,14 +7,24 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Movie } from "./schemas/movie.schema";
 import { Model, Types } from "mongoose";
 import { CreateMovieDto, UpdateMovieDto } from "./dto/movie.dto";
+import { StarWarsService } from "src/star-wars/star-wars.service";
 
 @Injectable()
 export class MoviesService {
-  constructor(@InjectModel(Movie.name) private movieModel: Model<Movie>) {}
+  constructor(
+    @InjectModel(Movie.name) private movieModel: Model<Movie>,
+    private readonly starWarsService: StarWarsService,
+  ) {}
 
   async findOne(title: string): Promise<Movie | null> {
     const query = this.movieModel.where({ title });
     return query.findOne();
+  }
+
+  async syncMovies(role: string): Promise<void> {
+    this.isAdminRole(role);
+    const response = await this.starWarsService.findAllMovies();
+    console.log("response", response);
   }
 
   async getAllMovies(): Promise<{ count: number; movies: Movie[] }> {

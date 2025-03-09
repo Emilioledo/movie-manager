@@ -21,6 +21,14 @@ export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
   @HttpCode(HttpStatus.OK)
+  @UseGuards(AuthGuard)
+  @Post("sync")
+  async syncMovies(@Req() request) {
+    const { role } = request.user;
+    return this.moviesService.syncMovies(role);
+  }
+
+  @HttpCode(HttpStatus.OK)
   @Get()
   async getAllMovies() {
     return this.moviesService.getAllMovies();

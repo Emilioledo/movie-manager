@@ -3,10 +3,9 @@ import {
   Controller,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
-  Put,
   Req,
-  UnauthorizedException,
   UseGuards,
   ValidationPipe,
 } from "@nestjs/common";
@@ -32,7 +31,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard)
   @HttpCode(HttpStatus.OK)
-  @Put("change-role")
+  @Patch("change-role")
   async changeRole(
     @Body(ValidationPipe) changeRoleDto: ChangeRoleDto,
     @Req() request,

@@ -13,7 +13,7 @@ import {
   ValidationPipe,
 } from "@nestjs/common";
 import { MoviesService } from "./movies.service";
-import { AuthGuard } from "src/auth/guards/Auth.guard";
+import { AuthGuard } from "auth/guards/Auth.guard";
 import { CreateMovieDto, UpdateMovieDto } from "./dto/movie.dto";
 
 @Controller("movies")

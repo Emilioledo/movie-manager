@@ -7,7 +7,7 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Movie } from "./schemas/movie.schema";
 import { Model, Types } from "mongoose";
 import { CreateMovieDto, UpdateMovieDto } from "./dto/movie.dto";
-import { StarWarsService } from "src/star-wars/star-wars.service";
+import { StarWarsService } from "star-wars/star-wars.service";
 
 @Injectable()
 export class MoviesService {

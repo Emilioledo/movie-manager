@@ -5,7 +5,7 @@ import { MongooseModule } from "@nestjs/mongoose";
 import { Movie, MovieSchema } from "./schemas/movie.schema";
 import { JwtModule } from "@nestjs/jwt";
 import { ConfigModule, ConfigService } from "@nestjs/config";
-import { StarWarsModule } from "src/star-wars/star-wars.module";
+import { StarWarsModule } from "star-wars/star-wars.module";
 
 @Module({
   imports: [

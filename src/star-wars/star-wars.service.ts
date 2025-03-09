@@ -1,15 +1,15 @@
 import { HttpService } from "@nestjs/axios";
 import { Injectable } from "@nestjs/common";
 import { firstValueFrom } from "rxjs";
-import { Movie } from "src/movies/interfaces/movies.interface";
+import { ApiResponse } from "./interfaces/star-wars.interface";
 
 @Injectable()
 export class StarWarsService {
   constructor(private readonly httpService: HttpService) {}
 
-  async findAllMovies(): Promise<Movie[]> {
+  async findAllMovies(): Promise<ApiResponse> {
     const response = await firstValueFrom(
-      this.httpService.get<Movie[]>(process.env.API_BASE_URL!),
+      this.httpService.get<ApiResponse>(process.env.API_BASE_URL!),
     );
     return response.data;
   }

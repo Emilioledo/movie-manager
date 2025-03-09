@@ -23,8 +23,27 @@ export class MoviesService {
 
   async syncMovies(role: string): Promise<void> {
     this.isAdminRole(role);
-    const response = await this.starWarsService.findAllMovies();
-    console.log("response", response);
+
+    const { results } = await this.starWarsService.findAllMovies();
+
+    const promises = results.map(async (movie) => {
+      const docMovie = await this.movieModel.findOne({ title: movie.title });
+
+      if (!docMovie) {
+        const newMovie: Movie = {
+          title: movie.title,
+          director: movie.director,
+          producer: movie.producer,
+          release_date: movie.release_date,
+          created: movie.created,
+          edited: movie.edited,
+        };
+
+        await this.movieModel.create(newMovie);
+      }
+    });
+
+    await Promise.all(promises);
   }
 
   async getAllMovies(): Promise<{ count: number; movies: Movie[] }> {

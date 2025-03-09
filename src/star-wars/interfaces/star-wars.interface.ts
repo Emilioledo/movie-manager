@@ -1,4 +1,4 @@
-export interface Movie {
+interface Movie {
   title: string;
   episode_id: number;
   opening_crawl: string;
@@ -13,4 +13,11 @@ export interface Movie {
   created: string;
   edited: string;
   url: string;
+}
+
+export interface ApiResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Movie[];
 }

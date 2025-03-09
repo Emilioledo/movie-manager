@@ -1,6 +1,7 @@
 {
   "name": "movie-manager",
   "version": "0.0.1",
+  "packageManager": "pnpm@9.6.0",
   "description": "",
   "author": "",
   "private": true,
